@@ -41,6 +41,22 @@ jobs:
           name: "Backend type check"
           command: npm run type-check
           working_directory: "backend/"
+  backend-unit-tests:
+    docker:
+      - image: node:lts
+    steps:
+      - checkout
+      - run:
+          name: "Install node_modules"
+          command: npm install
+      - run:
+          name: "Install db"
+          command: npm run db-install
+          working_directory: "backend/"
+      - run:
+          name: "Backend unit tests"
+          command: npm run unit-tests
+          working_directory: "backend/"
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -49,3 +65,4 @@ workflows:
     jobs:
       - backend-lint
       - backend-type-check
+      - backend-unit-tests
