@@ -5,22 +5,78 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  say-hello:
+  backend-lint:
     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/configuration-reference/#executor-job
     docker:
-      - image: cimg/base:stable
+      - image: node:lts
     # Add steps to the job
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
       - checkout
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: "Install node_modules"
+          command: npm install
+      - run:
+          name: "Backend lint"
+          command: npm run lint-check
+          working_directory: "backend/"
+  backend-type-check:
+    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/configuration-reference/#executor-job
+    docker:
+      - image: node:lts
+    # Add steps to the job
+    # See: https://circleci.com/docs/configuration-reference/#steps
+    steps:
+      - checkout
+      - run:
+          name: "Install node_modules"
+          command: npm install
+      - run:
+          name: "Install db"
+          command: npm run db-install
+          working_directory: "backend/"
+      - run:
+          name: "Backend type check"
+          command: npm run type-check
+          working_directory: "backend/"
+  backend-unit-tests:
+    docker:
+      - image: node:lts
+    steps:
+      - checkout
+      - run:
+          name: "Install node_modules"
+          command: npm install
+      - run:
+          name: "Install db"
+          command: npm run db-install
+          working_directory: "backend/"
+      - run:
+          name: "Backend unit tests"
+          command: npm run unit-tests
+          working_directory: "backend/"
+  release:
+    docker:
+      - image: node:lts
+    steps:
+      - checkout
+      - run:
+          name: "Install node_modules"
+          command: npm install
+      - run:
+          name: "Run semantic-release"
+          command: npm run cd-semantic-release
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  backend-ci-workflow:
     jobs:
-      - say-hello
+      - backend-lint
+      - backend-type-check
+      - backend-unit-tests
+  cd-workflow:
+    jobs:
+      - release
