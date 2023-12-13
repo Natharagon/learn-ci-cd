@@ -15,11 +15,11 @@ jobs:
     steps:
       - checkout
       - run:
-        name: "Install node_modules"
-        command: |
-          sudo apt update
-          sudo apt install nodejs
-          npm install
+          name: "Install node_modules"
+          command: |
+              sudo apt update
+              sudo apt install nodejs
+              npm install
       - run:
           name: "Backend lint"
           command: npm run lint-check
