@@ -16,6 +16,8 @@ jobs:
       - checkout
       - run:
           name: "Install node_modules"
+          command: "sudo apt update"
+          command: "sudo apt install nodejs"
           command: "npm install"
       - run:
           name: "Backend lint"
